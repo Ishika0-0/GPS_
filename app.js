@@ -4,7 +4,7 @@
 let startTime = null; // Time when the session started
 let lastLatitude = null; // Previous latitude for distance calculation
 let lastLongitude = null; // Previous longitude for distance calculation
-let totalDistance = 0; // Total distance traveled in kilometers
+let totalDistance = 0; // Total distance traveled in meters
 let timerInterval = null; // Timer for tracking elapsed time
 let watchId = null; // ID for geolocation watch to stop tracking
 
@@ -26,9 +26,9 @@ function pad(num) {
     return num < 10 ? `0${num}` : num;
 }
 
-// Calculate the distance between two lat/lng points in km using Haversine formula
+// Calculate the distance between two lat/lng points in meters using Haversine formula
 function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radius of Earth in kilometers
+    const R = 6371000; // Radius of Earth in meters (not kilometers)
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
     const a =
@@ -36,7 +36,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
         Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in kilometers
+    return R * c; // Distance in meters
 }
 
 // Start tracking function
@@ -61,11 +61,11 @@ function startTracking() {
                 timerInterval = setInterval(updateTime, 1000); // Start the timer
             }
 
-            // If we have previous coordinates, calculate distance
+            // If we have previous coordinates, calculate distance in meters
             if (lastLatitude !== null && lastLongitude !== null) {
                 const distance = calculateDistance(lastLatitude, lastLongitude, lat, lon);
-                totalDistance += distance; // Add to the total distance
-                document.getElementById("distance").textContent = `Distance: ${totalDistance.toFixed(2)} km`;
+                totalDistance += distance; // Add to the total distance (in meters)
+                document.getElementById("distance").textContent = `Distance: ${totalDistance.toFixed(0)} m`;
             }
 
             // Update the previous coordinates for the next calculation
@@ -112,7 +112,7 @@ function stopTracking() {
     lastLongitude = null;
     totalDistance = 0;
     document.getElementById("speed").textContent = `Speed: 0 m/s`;
-    document.getElementById("distance").textContent = `Distance: 0 km`;
+    document.getElementById("distance").textContent = `Distance: 0 m`;
     document.getElementById("time").textContent = `Time: 00:00`;
     document.getElementById("coordinates").textContent = `Latitude: 0, Longitude: 0`;
 }
